@@ -1,0 +1,575 @@
+{% extends 'Hr/base_hr.html' %}
+{% load static %}
+{% load django_permissions %}
+{% load image_utils %}
+{% load form_utils %}
+
+{% block title %}قائمة الأقسام - نظام الدولية{% endblock %}
+
+{% block page_title %}قائمة الأقسام{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'accounts:home' %}">الرئيسية</a></li>
+<li class="breadcrumb-item"><a href="{% url 'Hr:dashboard' %}">الموارد البشرية</a></li>
+<li class="breadcrumb-item active">قائمة الأقسام</li>
+{% endblock %}
+
+{% block content %}
+<!-- Search and Filter Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="fas fa-building text-primary me-2"></i>قائمة الأقسام
+                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">{{ title }}</h4>
+                    {% if perms.Hr.add_department or user|is_admin %}
+                    <a href="{% url 'Hr:departments:create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i> إضافة قسم جديد
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8 mb-3 mb-md-0">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" id="departmentSearch" class="form-control" placeholder="ابحث عن قسم (بالاسم أو الكود)..." aria-label="بحث">
+                            <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="departmentSort" class="form-select">
+                            <option value="name">ترتيب حسب الاسم</option>
+                            <option value="code">ترتيب حسب الكود</option>
+                            <option value="employees">ترتيب حسب عدد الموظفين</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Department Cards View -->
+<div class="row g-4" id="departmentsContainer">
+    {% if departments %}
+        {% for department in departments %}
+        <div class="col-lg-4 col-md-6 department-card"
+             data-name="{{ department.dept_name }}"
+             data-code="{{ department.dept_code }}"
+             data-employees="{{ department.employee_count }}">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title">
+                            {% if department.is_active %}
+                            <span class="status-indicator status-active" title="نشط"></span>
+                            {% else %}
+                            <span class="status-indicator status-inactive" title="غير نشط"></span>
+                            {% endif %}
+                            {{ department.dept_name }}
+                        </h5>
+                        <span class="badge bg-primary rounded-pill">{{ department.employee_count }} موظف</span>
+                    </div>
+
+                    {% if department.manager %}
+                    <div class="department-manager d-flex align-items-center mb-3 pb-3 border-bottom">
+                        {% if department.manager.emp_image %}
+                        <img src="{{ department.manager.emp_image|binary_to_img }}" alt="{{ department.manager.emp_full_name }}" class="rounded-circle me-2 object-fit-cover" width="48" height="48">
+                        {% else %}
+                        <div class="avatar bg-primary text-white me-2">
+                            {% if department.manager.emp_first_name %}
+                                {{ department.manager.emp_first_name|slice:":1"|upper }}
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <a href="{% url 'Hr:employees:detail' department.manager.emp_id %}" class="d-block fw-medium text-decoration-none">{{ department.manager.emp_full_name }}</a>
+                            <small class="text-muted">
+                                <i class="fas fa-user-tie me-1"></i>مدير القسم
+                                {% if department.manager.jop_name %}
+                                <span class="d-block mt-1"><i class="fas fa-briefcase me-1"></i>{{ department.manager.jop_name }}</span>
+                                {% endif %}
+                                {% if department.manager.emp_phone1 %}
+                                <span class="d-block mt-1"><i class="fas fa-phone me-1"></i>{{ department.manager.emp_phone1 }}</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="department-manager d-flex align-items-center mb-3 pb-3 border-bottom">
+                        <div class="avatar bg-secondary text-white me-2">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-medium text-muted">غير محدد</span>
+                            <small class="text-muted">مدير القسم</small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <p class="card-text text-muted mb-3">{{ department.note|default:"لا توجد ملاحظات"|truncatechars:100 }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted d-block">كود القسم: {{ department.dept_code }}</small>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'Hr:departments:detail' department.dept_code %}" class="btn btn-outline-primary" title="عرض التفاصيل">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if perms.Hr.change_department or user|is_admin %}
+                            <a href="{% url 'Hr:departments:edit' department.dept_code %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> تعديل
+                            </a>
+                            {% endif %}
+                            {% if perms.Hr.delete_department or user|is_admin %}
+                            <button type="button" class="btn btn-sm btn-danger delete-department"
+                                    data-department-id="{{ department.dept_code }}"
+                                    data-department-name="{{ department.dept_name }}">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-building fa-3x mb-3 text-muted"></i>
+                <p class="mb-0">لا توجد أقسام مسجلة حالياً.</p>
+                {% if perms.hr.add_department or user.is_admin %}
+                <a href="{% url 'Hr:departments:create' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus-circle me-1"></i> إضافة قسم جديد
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- No Results Message -->
+    <div id="noResults" class="col-12 d-none">
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+            <p class="mb-0">لا توجد نتائج مطابقة لبحثك.</p>
+            <button id="resetSearch" class="btn btn-outline-primary mt-3">
+                <i class="fas fa-redo me-1"></i> عرض جميع الأقسام
+            </button>
+        </div>
+    </div>
+
+    <!-- Add New Department Card -->
+    {% if perms.hr.add_department or user.is_admin %}
+    <div class="col-lg-4 col-md-6" id="addDepartmentCard">
+        <div class="card h-100 border-dashed border-primary-subtle">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center h-100 py-5">
+                <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+                <h5 class="card-title text-center">إضافة قسم جديد</h5>
+                <p class="card-text text-center text-muted mb-4">قم بإضافة قسم جديد إلى الهيكل التنظيمي للشركة</p>
+                <a href="{% url 'Hr:departments:create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> إضافة قسم
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">تأكيد الحذف</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف القسم: <span id="itemName" class="fw-bold"></span>؟</p>
+                <p class="text-danger mb-0"><i class="fas fa-exclamation-triangle me-1"></i> هذا الإجراء لا يمكن التراجع عنه.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">تأكيد الحذف</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Card Styles */
+    .border-dashed {
+        border-style: dashed !important;
+        border-width: 2px !important;
+    }
+
+    /* Avatar Styles */
+    .avatar {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 0.875rem;
+        font-weight: bold;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    /* Search and Filter Styles */
+    #departmentSearch:focus {
+        box-shadow: none;
+        border-color: #80bdff;
+    }
+
+    #clearSearch {
+        cursor: pointer;
+    }
+
+    #departmentSort {
+        cursor: pointer;
+    }
+
+    /* Animation for cards */
+    .department-card {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* No results message */
+    #noResults {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Department manager section */
+    .department-manager {
+        background-color: rgba(0, 0, 0, 0.01);
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .department-manager:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Manager job title */
+    .department-manager .text-muted span {
+        font-size: 0.8rem;
+        color: #6c757d;
+        display: inline-block;
+    }
+
+    /* Department status indicator */
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .status-active {
+        background-color: var(--success-color, #28a745);
+    }
+
+    .status-inactive {
+        background-color: var(--danger-color, #dc3545);
+    }
+
+    /* ===== TEXT VISIBILITY FIXES FOR DEPARTMENT LIST ===== */
+
+    /* Card Header Text Fixes */
+    .card-header h5 {
+        color: var(--text-primary) !important;
+    }
+
+    .card-header h4 {
+        color: var(--text-primary) !important;
+    }
+
+    /* Card Content Text Fixes */
+    .card-title {
+        color: var(--text-primary) !important;
+    }
+
+    .card-text {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Department Manager Text */
+    .department-manager a {
+        color: var(--text-primary) !important;
+    }
+
+    .department-manager .text-muted {
+        color: var(--text-secondary) !important;
+    }
+
+    .department-manager .fw-medium {
+        color: var(--text-primary) !important;
+    }
+
+    /* Search Input Text */
+    .form-control {
+        color: var(--text-primary) !important;
+        background-color: var(--bg-primary) !important;
+        border-color: var(--gray-300) !important;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-tertiary) !important;
+    }
+
+    .form-select {
+        color: var(--text-primary) !important;
+        background-color: var(--bg-primary) !important;
+        border-color: var(--gray-300) !important;
+    }
+
+    /* Input Group Text */
+    .input-group-text {
+        background-color: var(--gray-100) !important;
+        color: var(--text-secondary) !important;
+        border-color: var(--gray-300) !important;
+    }
+
+    /* Badge Text */
+    .badge {
+        color: var(--text-inverse) !important;
+    }
+
+    /* Small Text Elements */
+    small {
+        color: var(--text-secondary) !important;
+    }
+
+    /* No Results Text */
+    #noResults p {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Add Department Card Text */
+    #addDepartmentCard .card-title {
+        color: var(--text-primary) !important;
+    }
+
+    #addDepartmentCard .card-text {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Modal Text Fixes */
+    .modal-content {
+        background-color: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .modal-header {
+        background-color: var(--danger-color) !important;
+        color: var(--text-inverse) !important;
+    }
+
+    .modal-title {
+        color: var(--text-inverse) !important;
+    }
+
+    .modal-body p {
+        color: var(--text-primary) !important;
+    }
+
+    .modal-body .text-danger {
+        color: var(--danger-color) !important;
+    }
+
+    .modal-body .fw-bold {
+        color: var(--text-primary) !important;
+    }
+
+    /* Avatar Text */
+    .avatar {
+        color: var(--text-inverse) !important;
+    }
+
+    /* General Text Color Fixes */
+    .text-muted {
+        color: var(--text-secondary) !important;
+    }
+
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+
+    /* Ensure all card text is visible */
+    .card h5,
+    .card h4,
+    .card p,
+    .card span {
+        color: inherit;
+    }
+
+    /* Department Manager Background Fix */
+    .department-manager {
+        background-color: rgba(248, 250, 252, 0.5) !important;
+    }
+
+    .department-manager:hover {
+        background-color: var(--gray-100) !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle delete modal
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const itemName = button.getAttribute('data-name');
+                const url = button.getAttribute('data-url');
+
+                document.getElementById('itemName').textContent = itemName;
+                document.getElementById('confirmDelete').setAttribute('href', url);
+            });
+        }
+
+        // Search and filter functionality
+        const searchInput = document.getElementById('departmentSearch');
+        const sortSelect = document.getElementById('departmentSort');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const resetSearchBtn = document.getElementById('resetSearch');
+        const departmentCards = document.querySelectorAll('.department-card');
+        const noResultsDiv = document.getElementById('noResults');
+        const addDepartmentCard = document.getElementById('addDepartmentCard');
+
+        // Function to filter departments
+        function filterDepartments() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            departmentCards.forEach(card => {
+                const departmentName = card.getAttribute('data-name').toLowerCase();
+                const departmentCode = card.getAttribute('data-code').toLowerCase();
+
+                if (departmentName.includes(searchTerm) || departmentCode.includes(searchTerm)) {
+                    card.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResultsDiv.classList.remove('d-none');
+                if (addDepartmentCard) {
+                    addDepartmentCard.classList.add('d-none');
+                }
+            } else {
+                noResultsDiv.classList.add('d-none');
+                if (addDepartmentCard) {
+                    addDepartmentCard.classList.remove('d-none');
+                }
+            }
+        }
+
+        // Function to sort departments
+        function sortDepartments() {
+            const sortBy = sortSelect.value;
+            const container = document.getElementById('departmentsContainer');
+            const cards = Array.from(departmentCards);
+
+            cards.sort((a, b) => {
+                if (sortBy === 'name') {
+                    return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+                } else if (sortBy === 'code') {
+                    return a.getAttribute('data-code').localeCompare(b.getAttribute('data-code'));
+                } else if (sortBy === 'employees') {
+                    return parseInt(b.getAttribute('data-employees')) - parseInt(a.getAttribute('data-employees'));
+                }
+                return 0;
+            });
+
+            // Remove all cards from container
+            departmentCards.forEach(card => {
+                card.remove();
+            });
+
+            // Add sorted cards back to container before the "Add Department" card
+            if (addDepartmentCard) {
+                cards.forEach(card => {
+                    container.insertBefore(card, addDepartmentCard);
+                });
+            } else {
+                cards.forEach(card => {
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        // Event listeners
+        if (searchInput) {
+            searchInput.addEventListener('input', filterDepartments);
+        }
+
+        if (sortSelect) {
+            sortSelect.addEventListener('change', sortDepartments);
+        }
+
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                filterDepartments();
+            });
+        }
+
+        if (resetSearchBtn) {
+            resetSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                filterDepartments();
+            });
+        }
+    });
+</script>
+{% endblock %}

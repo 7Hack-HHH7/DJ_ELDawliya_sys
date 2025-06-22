@@ -1,0 +1,455 @@
+{% extends 'Hr/base_hr.html' %}
+{% load static %}
+
+{% block title %}لوحة تحكم الموارد البشرية - نظام الدولية{% endblock %}
+
+{% block page_title %}لوحة تحكم الموارد البشرية{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'accounts:home' %}">الرئيسية</a></li>
+<li class="breadcrumb-item active">لوحة تحكم الموارد البشرية</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard specific styles (these override or augment the base styles) */
+    .bg-gradient-warning-subtle {
+        background: linear-gradient(45deg, #f59e0b, #fbbf24);
+        color: var(--text-inverse) !important;
+    }
+
+    .quick-access-toolbar .card {
+        background: var(--bg-primary);
+        border: 1px solid var(--gray-200);
+    }
+
+    .quick-access-toolbar .card .card-body {
+        color: var(--text-primary) !important;
+    }
+
+    .quick-search .input-group {
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+    }
+
+    .quick-search .form-control {
+        border: 1px solid var(--gray-300);
+        color: var(--text-primary) !important;
+    }
+
+    .quick-search .form-control::placeholder {
+        color: var(--text-tertiary) !important;
+    }
+
+    /* Enhanced stats cards for dashboard */
+    .stats-card.highlight-card {
+        transition: var(--transition-normal);
+        border: 1px solid var(--gray-200);
+    }
+
+    .stats-card.highlight-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .stats-card .stats-number {
+        color: var(--text-primary) !important;
+    }
+
+    .stats-card .stats-title {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Action cards styling */
+    .action-card {
+        border: 1px solid var(--gray-200);
+        transition: var(--transition-normal);
+    }
+
+    .action-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-md);
+    }
+
+    .action-card .text-dark {
+        color: var(--text-primary) !important;
+    }
+
+    .action-card .text-muted {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Timeline styling */
+    .timeline-item h6 {
+        color: var(--text-primary) !important;
+    }
+
+    .timeline-item .text-muted {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Gradient cards text fixes */
+    .bg-gradient-primary,
+    .bg-gradient-success,
+    .bg-gradient-warning,
+    .bg-gradient-info {
+        color: var(--text-inverse) !important;
+    }
+
+    .bg-gradient-primary h4,
+    .bg-gradient-primary p,
+    .bg-gradient-success h4,
+    .bg-gradient-success p,
+    .bg-gradient-warning h4,
+    .bg-gradient-warning p,
+    .bg-gradient-info h4,
+    .bg-gradient-info p {
+        color: var(--text-inverse) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Quick Access Toolbar -->
+<div class="quick-access-toolbar mb-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-body py-2">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <div class="quick-actions d-flex">
+                    <a href="{% url 'Hr:employees:create' %}" class="btn btn-sm btn-primary me-2">
+                        <i class="fas fa-user-plus me-1"></i> إضافة موظف
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-info me-2" onclick="alert('نظام الحضور غير متاح حالياً')">
+                        <i class="fas fa-clipboard-check me-1"></i> سجل الحضور
+                    </a>
+                    <a href="{% url 'Hr:employees:employee_search' %}" class="btn btn-sm btn-outline-success me-2">
+                        <i class="fas fa-search me-1"></i> البحث المتقدم
+                    </a>
+                </div>
+                <div class="quick-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" id="quickSearch" placeholder="بحث عن موظف..." aria-label="بحث عن موظف">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" id="quickSearchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Stats Cards Section -->
+<div class="row mb-4 g-3">
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'Hr:employees:list' %}" class="text-decoration-none">
+            <div class="card shadow-sm stats-card primary h-100 highlight-card">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="stats-icon-wrapper bg-primary-subtle rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-users text-primary"></i>
+                    </div>
+                    <div>
+                        <div class="stats-number fs-2 fw-bold">{{ total_employees }}</div>
+                        <p class="stats-title text-muted mb-0">إجمالي الموظفين</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-primary-subtle text-primary rounded-pill">الكل</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'Hr:employees:list' %}?status=active" class="text-decoration-none">
+            <div class="card shadow-sm stats-card success h-100 highlight-card">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="stats-icon-wrapper bg-success-subtle rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-user-check text-success"></i>
+                    </div>
+                    <div>
+                        <div class="stats-number fs-2 fw-bold">{{ active_employees }}</div>
+                        <p class="stats-title text-muted mb-0">الموظفين النشطين</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-success-subtle text-success rounded-pill">نشط</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'Hr:departments:list' %}" class="text-decoration-none">
+            <div class="card shadow-sm stats-card info h-100 highlight-card">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="stats-icon-wrapper bg-info-subtle rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-building text-info"></i>
+                    </div>
+                    <div>
+                        <div class="stats-number fs-2 fw-bold">{{ departments_count }}</div>
+                        <p class="stats-title text-muted mb-0">الأقسام</p>
+                    </div>
+                    <div class="ms-auto">
+                        <i class="fas fa-angle-left text-muted"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'Hr:jobs:list' %}" class="text-decoration-none">
+            <div class="card shadow-sm stats-card warning h-100 highlight-card">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="stats-icon-wrapper bg-warning-subtle rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-briefcase text-warning"></i>
+                    </div>
+                    <div>
+                        <div class="stats-number fs-2 fw-bold">{{ jobs_count }}</div>
+                        <p class="stats-title text-muted mb-0">الوظائف</p>
+                    </div>
+                    <div class="ms-auto">
+                        <i class="fas fa-angle-left text-muted"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Main Content Section -->
+<div class="row g-4">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light py-3 border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="fas fa-users me-2 text-primary"></i>
+                    إدارة الموظفين
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6 col-xl-4">
+                        <a href="{% url 'Hr:employees:list' %}" class="card action-card h-100 text-decoration-none shadow-hover">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="action-icon bg-primary-subtle text-primary rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-dark">قائمة الموظفين</h6>
+                                    <p class="text-muted small mb-0">عرض وإدارة بيانات الموظفين</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-xl-4">
+                        <a href="{% url 'Hr:employees:create' %}" class="card action-card h-100 text-decoration-none shadow-hover">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="action-icon bg-success-subtle text-success rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-dark">إضافة موظف جديد</h6>
+                                    <p class="text-muted small mb-0">تسجيل بيانات موظف جديد</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-xl-4">
+                        <a href="{% url 'Hr:departments:list' %}" class="card action-card h-100 text-decoration-none shadow-hover">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="action-icon bg-info-subtle text-info rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-dark">الأقسام</h6>
+                                    <p class="text-muted small mb-0">عرض وإدارة الأقسام</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-xl-4">
+                        <a href="{% url 'Hr:jobs:list' %}" class="card action-card h-100 text-decoration-none shadow-hover">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="action-icon bg-warning-subtle text-warning rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-dark">الوظائف</h6>
+                                    <p class="text-muted small mb-0">عرض وإدارة المسميات الوظيفية</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <!-- Attendance Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light py-3 border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="fas fa-clock me-2 text-primary"></i>
+                    الحضور والانصراف
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-grid gap-3">
+                    <a href="#" class="card action-card text-decoration-none shadow-hover" onclick="alert('نظام الحضور غير متاح حالياً')">
+                        <div class="card-body d-flex align-items-center p-3">
+                            <div class="action-icon bg-primary-subtle text-primary rounded-circle me-3 flex-shrink-0">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 text-dark">سجلات الحضور</h6>
+                                <p class="text-muted small mb-0">عرض وإدارة سجلات الحضور</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light py-3 border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="fas fa-history me-2 text-primary"></i>
+                    النشاطات الأخيرة
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="timeline">
+                    {% if recent_employees %}
+                        {% for employee in recent_employees|slice:":5" %}
+                        <div class="timeline-item d-flex align-items-center mb-3">
+                            <div class="timeline-icon bg-success-subtle text-success rounded-circle me-3 flex-shrink-0">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">تم إضافة موظف جديد</h6>
+                                <p class="text-muted small mb-0">
+                                    {{ employee.emp_full_name }} - {{ employee.department.dept_name|default:"بدون قسم" }}
+                                </p>
+                                <small class="text-muted">{{ employee.emp_date_hiring|timesince }} مضت</small>
+                            </div>
+                            <a href="{% url 'Hr:employees:detail' employee.emp_id %}" class="btn btn-sm btn-outline-primary">
+                                عرض
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-clock fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">لا توجد أنشطة حديثة</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'Hr:employees:list' %}" class="btn btn-outline-primary btn-sm">
+                        عرض جميع الموظفين
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="row mt-4 g-3">
+    <div class="col-md-3">
+        <div class="card bg-gradient-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                <h4>{{ today_attendance|default:"0" }}</h4>
+                <p class="mb-0">حضور اليوم</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-user-shield fa-2x mb-2"></i>
+                <h4>{{ insured_employees|default:"0" }}</h4>
+                <p class="mb-0">مؤمن عليهم</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-warning text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                <h4>{{ on_leave_today|default:"0" }}</h4>
+                <p class="mb-0">في إجازة اليوم</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-info text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-birthday-cake fa-2x mb-2"></i>
+                <h4>{{ birthdays_today|default:"0" }}</h4>
+                <p class="mb-0">أعياد ميلاد اليوم</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Quick Search Functionality
+        const quickSearch = document.getElementById('quickSearch');
+        const quickSearchBtn = document.getElementById('quickSearchBtn');
+        
+        if (quickSearch && quickSearchBtn) {
+            // Handle search button click
+            quickSearchBtn.addEventListener('click', function() {
+                handleSearch();
+            });
+            
+            // Handle Enter key press in search input
+            quickSearch.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleSearch();
+                }
+            });
+            
+            function handleSearch() {
+                const searchTerm = quickSearch.value.trim();
+                if (searchTerm) {
+                    // Redirect to employee search with the search term
+                    window.location.href = "{% url 'Hr:employees:list' %}?search=" + encodeURIComponent(searchTerm);
+                }
+            }
+        }
+        
+        // Interactive Card Effects
+        const actionCards = document.querySelectorAll('.action-card');
+        actionCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+                
+                const icon = this.querySelector('.action-icon');
+                if (icon) {
+                    icon.classList.add('pulse');
+                    
+                    // Remove the animation class after it completes
+                    icon.addEventListener('animationend', function() {
+                        icon.classList.remove('pulse');
+                    }, { once: true });
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 10px rgba(0,0,0,0.05)';
+            });
+        });
+    });
+</script>
+{% endblock %}
