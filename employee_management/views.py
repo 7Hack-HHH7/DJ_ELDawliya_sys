@@ -32,11 +32,59 @@ class EmployeeManagementDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'employee_management/dashboard.html'
 
     def get_context_data(self, **kwargs):
+        from datetime import date, timedelta
+        from django.db.models import Count
+        from django.db import models
+
         context = super().get_context_data(**kwargs)
+
+        # Basic statistics
+        total_employees = Employee.objects.filter(is_active=True).count()
+        total_departments = Department.objects.filter(is_active=True).count()
+        total_job_titles = JobTitle.objects.filter(is_active=True).count()
+
+        # New employees this month
+        current_month = date.today().replace(day=1)
+        new_employees_this_month = Employee.objects.filter(
+            hire_date__gte=current_month,
+            is_active=True
+        ).count()
+
+        # Recent activities (mock data for now)
+        recent_activities = [
+            {
+                'title': 'تم إضافة موظف جديد',
+                'description': 'تم تسجيل موظف جديد في قسم التطوير',
+                'type': 'new',
+                'icon': 'user-plus',
+                'created_at': date.today() - timedelta(hours=2)
+            },
+            {
+                'title': 'تحديث بيانات قسم',
+                'description': 'تم تحديث بيانات قسم الموارد البشرية',
+                'type': 'update',
+                'icon': 'edit',
+                'created_at': date.today() - timedelta(hours=5)
+            },
+            {
+                'title': 'إضافة وظيفة جديدة',
+                'description': 'تم إضافة مسمى وظيفي جديد: مطور أول',
+                'type': 'new',
+                'icon': 'briefcase',
+                'created_at': date.today() - timedelta(days=1)
+            }
+        ]
+
+        # Departments with employee count
+        departments = Department.objects.filter(is_active=True).annotate(
+            employee_count=Count('employees', filter=models.Q(employees__is_active=True))
+        ).order_by('-employee_count')[:5]
+
         context.update({
-            'total_employees': Employee.objects.filter(is_active=True).count(),
-            'total_departments': Department.objects.filter(is_active=True).count(),
-            'total_job_titles': JobTitle.objects.filter(is_active=True).count(),
+            'total_employees': total_employees,
+            'total_departments': total_departments,
+            'total_job_titles': total_job_titles,
+            'new_employees_this_month': new_employees_this_month,
             'recent_hires': Employee.objects.filter(is_active=True).order_by('-hire_date')[:5],
             'pending_notes': EmployeeNote.objects.filter(
                 requires_followup=True,
@@ -46,6 +94,8 @@ class EmployeeManagementDashboardView(LoginRequiredMixin, TemplateView):
                 expiry_date__isnull=False,
                 is_active=True
             ).order_by('expiry_date')[:5],
+            'recent_activities': recent_activities,
+            'departments': departments,
         })
         return context
 

@@ -506,3 +506,18 @@ INFO 2025-05-28 14:45:09,056 services 2528 1352 Gemini AI configured successfull
 INFO 2025-05-28 15:58:57,009 services 9248 10680 Found Gemini provider: 1
 INFO 2025-05-28 15:58:57,012 services 9248 10680 Using Gemini configuration for user Gamal, API key: AIzaS..., model: gemini-1.5-flash
 INFO 2025-05-28 15:58:57,013 services 9248 10680 Gemini AI configured successfully with model: gemini-1.5-flash
+INFO 2025-06-22 18:14:36,139 services 14628 15684 Found Gemini provider: 1
+INFO 2025-06-22 18:14:36,154 services 14628 15684 Using Gemini configuration for user Gamal, API key: AIzaS..., model: gemini-1.5-flash
+INFO 2025-06-22 18:14:36,155 services 14628 15684 Gemini AI configured successfully with model: gemini-1.5-flash
+INFO 2025-06-22 18:16:07,827 services 31584 30884 Found Gemini provider: 1
+INFO 2025-06-22 18:16:07,842 services 31584 30884 Using Gemini configuration for user Gamal, API key: AIzaS..., model: gemini-1.5-flash
+INFO 2025-06-22 18:16:07,843 services 31584 30884 Gemini AI configured successfully with model: gemini-1.5-flash
+INFO 2025-06-22 18:16:17,458 services 31584 10160 Found Gemini provider: 1
+INFO 2025-06-22 18:16:17,466 services 31584 10160 Using Gemini configuration for user Gamal, API key: AIzaS..., model: gemini-1.5-flash
+INFO 2025-06-22 18:16:17,466 services 31584 10160 Gemini AI configured successfully with model: gemini-1.5-flash
+INFO 2025-06-22 18:16:40,729 services 31584 29260 Found Gemini provider: 1
+INFO 2025-06-22 18:16:40,737 services 31584 29260 Using Gemini configuration for user Gamal, API key: AIzaS..., model: gemini-1.5-flash
+INFO 2025-06-22 18:16:40,738 services 31584 29260 Gemini AI configured successfully with model: gemini-1.5-flash
+INFO 2025-06-22 18:17:21,657 services 31584 30796 Found Gemini provider: 1
+INFO 2025-06-22 18:17:21,667 services 31584 30796 Using Gemini configuration for user Gamal, API key: AIzaS..., model: gemini-1.5-flash
+INFO 2025-06-22 18:17:21,668 services 31584 30796 Gemini AI configured successfully with model: gemini-1.5-flash
