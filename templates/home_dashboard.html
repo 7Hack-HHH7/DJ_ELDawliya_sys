@@ -497,7 +497,7 @@
             <h3><i class="fas fa-th-large me-2"></i> الأقسام</h3>
         </div>
         <ul class="department-list">
-            {% if perms.Hr.view_employee or perms.Hr.add_employee or perms.Hr.change_employee or perms.Hr.delete_employee %}
+            {% if perms.employee_management.view_employee or perms.employee_management.add_employee or perms.employee_management.change_employee or perms.employee_management.delete_employee %}
                 <li class="department-item" data-dept="hr">
                     <i class="fas fa-users"></i>
                     <span>الموارد البشرية</span>
@@ -633,18 +633,18 @@
                         <h3 class="mb-3">قسم الموارد البشرية</h3>
                         <div class="row">
                             <div class="col-md-6 col-lg-4">
-                                <a href="{% url 'Hr:dashboard' %}" class="text-decoration-none">
+                                <a href="{% url 'employee_management:dashboard' %}" class="text-decoration-none">
                                     <div class="card hr-card">
                                         <div class="card-info">
-                                            <i class="fas fa-home card-icon"></i>
-                                            <p class="title">الصفحة الرئيسية</p>
-                                            <p class="card-subtitle">الصفحة الرئيسية للموارد البشرية</p>
+                                            <i class="fas fa-users card-icon"></i>
+                                            <p class="title">إدارة الموظفين</p>
+                                            <p class="card-subtitle">إدارة بيانات الموظفين والأقسام</p>
                                         </div>
                                     </div>
                                 </a>
                             </div>
                             <div class="col-md-6 col-lg-4">
-                                <a href="{% url 'Hr:employees:list' %}" class="text-decoration-none">
+                                <a href="{% url 'employee_management:employee_list' %}" class="text-decoration-none">
                                     <div class="card hr-card">
                                         <div class="card-info">
                                             <i class="fas fa-id-card card-icon"></i>
@@ -655,12 +655,12 @@
                                 </a>
                             </div>
                             <div class="col-md-6 col-lg-4">
-                                <a href="{% url 'Hr:salary_item_list' %}" class="text-decoration-none">
+                                <a href="{% url 'leave_management:dashboard' %}" class="text-decoration-none">
                                     <div class="card hr-card">
                                         <div class="card-info">
-                                            <i class="fas fa-money-bill-wave card-icon"></i>
-                                            <p class="title">بنود الرواتب</p>
-                                            <p class="card-subtitle">إدارة بنود الرواتب</p>
+                                            <i class="fas fa-calendar-alt card-icon"></i>
+                                            <p class="title">إدارة الإجازات</p>
+                                            <p class="card-subtitle">إدارة طلبات الإجازات والأرصدة</p>
                                         </div>
                                     </div>
                                 </a>
@@ -668,17 +668,18 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 col-lg-4">
-                                <a href="{% url 'attendance:dashboard' %}" class="text-decoration-none">
+                                <a href="{% url 'attendance_system:dashboard' %}" class="text-decoration-none">
                                     <div class="card hr-card">
                                         <div class="card-info">
                                             <i class="fas fa-clock card-icon"></i>
                                             <p class="title">نظام الحضور والانصراف</p>
-                                            <p class="card-subtitle">إدارة الحضور والانصراف</p>
+                                            <p class="card-subtitle">إدارة الحضور والانصراف المتقدم</p>
                                         </div>
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-md-6 col-lg-4">                                <a href="{% url 'attendance:mark_attendance' %}" class="text-decoration-none">
+                            <div class="col-md-6 col-lg-4">
+                                <a href="{% url 'attendance_system:mark_attendance' %}" class="text-decoration-none">
                                     <div class="card hr-card">
                                         <div class="card-info">
                                             <i class="fas fa-fingerprint card-icon"></i>
@@ -689,12 +690,12 @@
                                 </a>
                             </div>
                             <div class="col-md-6 col-lg-4">
-                                <a href="{% url 'attendance:leave_balance_list' %}" class="text-decoration-none">
+                                <a href="{% url 'payroll_management:dashboard' %}" class="text-decoration-none">
                                     <div class="card hr-card">
                                         <div class="card-info">
-                                            <i class="fas fa-calendar-alt card-icon"></i>
-                                            <p class="title">رصيد الإجازات</p>
-                                            <p class="card-subtitle">إدارة رصيد الإجازات</p>
+                                            <i class="fas fa-money-bill-wave card-icon"></i>
+                                            <p class="title">إدارة الرواتب</p>
+                                            <p class="card-subtitle">إدارة الرواتب والمكافآت</p>
                                         </div>
                                     </div>
                                 </a>

@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.timezone import now
-from Hr.models import Employee
+from hr_stubs.models import Employee
 from .models import EmployeeAttendanceProfile, AttendanceRule, LeaveType, LeaveBalance
 
 

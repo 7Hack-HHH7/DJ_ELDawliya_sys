@@ -16,8 +16,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
-from Hr.models.employee_model import Employee
-from Hr.models.task_models import EmployeeTask
+from hr_stubs.models import Employee, EmployeeTask
 from meetings.models import Meeting, Attendee
 from tasks.models import Task
 from inventory.models import TblProducts

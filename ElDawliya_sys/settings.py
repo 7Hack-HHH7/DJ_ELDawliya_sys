@@ -43,7 +43,11 @@ INSTALLED_APPS = [
     'accounts',
     'meetings',
     'tasks',
-    'Hr',
+    'hr_stubs',  # Temporary stub models for HR removal
+    'employee_management.apps.EmployeeManagementConfig',  # Employee Management Module
+    'leave_management.apps.LeaveManagementConfig',  # Leave Management Module
+    'attendance_system.apps.AttendanceSystemConfig',  # Attendance System Module
+    'payroll_management.apps.PayrollManagementConfig',  # Payroll Management Module
     'inventory',
     'administrator',
     'Purchase_orders',

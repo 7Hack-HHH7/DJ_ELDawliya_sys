@@ -16,7 +16,7 @@ from .models import (
     AttendanceRule,
     WorkSchedule
 )
-from Hr.models import Employee
+from hr_stubs.models import Employee
 
 
 class AttendanceRecordListView(LoginRequiredMixin, ListView):

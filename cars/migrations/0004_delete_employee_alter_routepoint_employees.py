@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Hr', '0002_initial'),
+        ('hr_stubs', '0001_initial'),
         ('cars', '0003_employee_alter_car_car_status_alter_car_car_type_and_more'),
     ]
 
@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='routepoint',
             name='employees',
-            field=models.ManyToManyField(blank=True, related_name='car_route_points', to='Hr.employee', verbose_name='الموظفين'),
+            field=models.ManyToManyField(blank=True, related_name='car_route_points', to='hr_stubs.employee', verbose_name='الموظفين'),
         ),
     ]

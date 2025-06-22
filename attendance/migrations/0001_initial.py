@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('Hr', '0003_alter_employee_emp_image'),
+        ('hr_stubs', '0001_initial'),
     ]
 
     operations = [
@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created At')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated At')),
                 ('attendance_rule', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='employee_profiles', to='attendance.attendancerule', verbose_name='Attendance Rule')),
-                ('employee', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='attendance_profile', to='Hr.employee', verbose_name='Employee')),
+                ('employee', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='attendance_profile', to='hr_stubs.employee', verbose_name='Employee')),
             ],
             options={
                 'verbose_name': 'Employee Attendance Profile',
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
                 ('notes', models.TextField(blank=True, verbose_name='Notes')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created At')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated At')),
-                ('employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='new_attendance_records', to='Hr.employee', verbose_name='Employee')),
+                ('employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='new_attendance_records', to='hr_stubs.employee', verbose_name='Employee')),
             ],
             options={
                 'verbose_name': 'Attendance Record',
@@ -98,7 +98,7 @@ class Migration(migrations.Migration):
                 ('used_days', models.DecimalField(decimal_places=2, default=0, max_digits=6, validators=[django.core.validators.MinValueValidator(0)], verbose_name='Used Days')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created At')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated At')),
-                ('employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='leave_balances', to='Hr.employee', verbose_name='Employee')),
+                ('employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='leave_balances', to='hr_stubs.employee', verbose_name='Employee')),
                 ('leave_type', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='employee_balances', to='attendance.leavetype', verbose_name='Leave Type')),
             ],
             options={

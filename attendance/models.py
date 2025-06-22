@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db.models import Count, Q
-from Hr.models import Employee
+from hr_stubs.models import Employee
 
 
 class AttendanceRule(models.Model):

@@ -45,7 +45,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),  # مسارات تطبيق الحسابات
     path('meetings/', include('meetings.urls')),  # مسارات تطبيق الاجتماعات
     path('tasks/', include('tasks.urls')),  # مسارات تطبيق المهام
-    path('Hr/', include('Hr.urls')), #مسارات تطبيق الموارد البشرية
+    # HR app removed - will be replaced with modular HR applications
     path('inventory/', include('inventory.urls_minimal')),  # مسارات تطبيق مخزن قطع الغيار (النسخة المبسطة)
     path('purchase/', include('Purchase_orders.urls')), # مسارات تطبيق طلبات الشراء
     path('administrator/', include('administrator.urls')),  # مسارات تطبيق مدير النظام

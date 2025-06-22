@@ -5,9 +5,7 @@ from django.utils import timezone
 from django.db.models import F
 
 # استيراد النماذج من التطبيقات الأخرى
-from Hr.models.task_models import EmployeeTask, TaskStep
-from Hr.models.employee_model import Employee
-from Hr.models.leave_models import EmployeeLeave
+from hr_stubs.models import EmployeeTask, TaskStep, Employee, EmployeeLeave
 
 # استيراد ملفات الإشارات الإضافية
 from .signals_meetings import *
@@ -15,7 +13,7 @@ from .signals_tasks import *
 from .signals_inventory import *
 from .signals_purchase import *
 from .signals_inventory_purchase import *
-from Hr.models.car_models import Car
+from hr_stubs.models import Car
 from meetings.models import Meeting, Attendee
 from tasks.models import Task, TaskStep as MeetingTaskStep
 from inventory.models import TblProducts, TblInvoiceitems

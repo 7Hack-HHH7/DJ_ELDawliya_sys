@@ -31,7 +31,12 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),  # مسارات تطبيق الحسابات
     path('meetings/', include('meetings.urls')),  # مسارات تطبيق الاجتماعات
     path('tasks/', include('tasks.urls')),  # مسارات تطبيق المهام
-    path('Hr/', include('Hr.urls_minimal')), #مسارات تطبيق الموارد البشرية - USING WORKING VERSION
+    # Modular HR Applications
+    path('hr/employees/', include('employee_management.urls')),
+    path('hr/leave/', include('leave_management.urls')),
+    path('hr/attendance/', include('attendance_system.urls')),
+    path('hr/payroll/', include('payroll_management.urls')),
+    # Legacy attendance app (to be removed)
     path('attendance/', include('attendance.urls')),
     path('inventory/', include('inventory.urls')), # مسارات تطبيق مخزن قطع الغيار
     path('purchase/', include('Purchase_orders.urls')), # مسارات تطبيق طلبات الشراء

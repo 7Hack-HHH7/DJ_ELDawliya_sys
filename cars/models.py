@@ -1,6 +1,6 @@
 from django.db import models
-# Import the HR app's Employee model
-from Hr.models.employee_model import Employee
+# Import the HR stub Employee model
+from hr_stubs.models import Employee
 
 class Supplier(models.Model):
     """Model for storing supplier information"""
@@ -155,7 +155,7 @@ class RoutePoint(models.Model):
     point_name = models.CharField(max_length=100, verbose_name="اسم النقطة")
     departure_time = models.TimeField(verbose_name="وقت المغادرة")
     order = models.PositiveIntegerField(default=0, verbose_name="الترتيب")
-    employees = models.ManyToManyField('Hr.Employee', related_name='car_route_points', blank=True, verbose_name="الموظفين")
+    employees = models.ManyToManyField(Employee, related_name='car_route_points', blank=True, verbose_name="الموظفين")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
